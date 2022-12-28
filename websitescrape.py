@@ -33,6 +33,7 @@ class PyEcoCal:
         self.p1 = p1
 
     def get_economic_calendar(self, date):
+        global dict_
         baseURL = "https://www.forexfactory.com/"
 
         ssl._create_default_https_context = ssl._create_unverified_context
@@ -93,14 +94,14 @@ class PyEcoCal:
         json_object = json.dumps(ComplexEncoder().encode(ecoDict), indent = 3)  
         return json_object
 eco = PyEcoCal()
-json = eco.get_economic_calendar("calendar?day=jan4.2023")
+json = eco.get_economic_calendar("calendar?day=jan11.2023")
 
 intents = discord.Intents.all()
 client = discord.Client(command_prefix='!', intents=intents)
  
 @client.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    print('We have logged in as ' + client.user.name)
  
 @client.event
 async def on_message(message):
@@ -109,6 +110,11 @@ async def on_message(message):
  
     if message.content.startswith('hi'):
         await message.channel.send('Hello!')
+
+        embed = discord.Embed(title=dict_["Event"], description='Check hem meteen en vergeet geen duimpje achter te laten', color=15548997)
+        embed.set_footer(text="DoopieCash | © 2022")
+        embed.set_author(name='DoopieCash - Traden & Investeren', icon_url=client.user.avatar.url)
+        log = client.get_channel(1052977554119733301)
+        await log.send(embed=embed)
  
-client.run('<Your Bot Token>')
-f
+client.run('ODU5NDM0MzQ5NDI2NTA3Nzg2.G3ogtX.kHjrP388FlLDdq49NYdATuNvFUfWcurS-Gp8mE')
