@@ -108,13 +108,5 @@ async def on_message(message):
     if message.author == client.user:
         return
  
-    if message.content.startswith('hi'):
-        await message.channel.send('Hello!')
-
-        embed = discord.Embed(title=dict_["Event"], description='Check hem meteen en vergeet geen duimpje achter te laten', color=15548997)
-        embed.set_footer(text="DoopieCash | © 2022")
-        embed.set_author(name='DoopieCash - Traden & Investeren', icon_url=client.user.avatar.url)
-        log = client.get_channel(1052977554119733301)
-        await log.send(embed=embed)
  
 client.run('YOUR_TOKEN_HERE')
