@@ -117,4 +117,4 @@ async def on_message(message):
         log = client.get_channel(1052977554119733301)
         await log.send(embed=embed)
  
-client.run('ODU5NDM0MzQ5NDI2NTA3Nzg2.G3ogtX.kHjrP388FlLDdq49NYdATuNvFUfWcurS-Gp8mE')
+client.run('YOUR_TOKEN_HERE')
