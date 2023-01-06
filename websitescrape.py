@@ -99,5 +99,6 @@ class PyEcoCal:
         json_object = json.dumps(ComplexEncoder().encode(ecoDict), indent = 3)  
         return json_object, ecoday
 eco = PyEcoCal()
+
 json, ecoday = eco.get_economic_calendar("calendar?day=jan11.2023")
 print(ecoday)
