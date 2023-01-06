@@ -1,10 +1,12 @@
 from bs4 import BeautifulSoup
+import urllib3
 import urllib.request
 import urllib.parse
 import pandas
 import logging
 import ssl
 import json
+from json import loads
 from json import JSONEncoder
 import discord
  
@@ -33,7 +35,6 @@ class PyEcoCal:
         self.p1 = p1
 
     def get_economic_calendar(self, date):
-        global dict_
         baseURL = "https://www.forexfactory.com/"
 
         ssl._create_default_https_context = ssl._create_unverified_context
@@ -57,26 +58,31 @@ class PyEcoCal:
         table = soup.find_all("tr", class_="calendar_row")
 
         ecoday = []
+        MyBoolean = False
+        dict_ = {}
         for item in table:
-            dict_ = {}
-        
+
             dict_["Currency"] = item.find_all("td", {"class":"calendar__currency"})[0].text.strip() #Currency
             dict_["Event"] = item.find_all("td",{"class":"calendar__event"})[0].text.strip() #Event Name
             dict_["Time_Eastern"] = item.find_all("td", {"class":"calendar__time"})[0].text #Time Eastern
-            impact = item.find_all("td", {"class":"impact"})
-
-
+            impact = item.find_all("td", {"class":"calendar__impact"})
+            
             for icon in range(0,len(impact)):
-                  if (impact_value := impact[icon].find_all("span")[0]['title'].split(' ', 1)[0]) == "High":
-                        dict_["Impact"] = impact_value
-                        dict_["Actual"] = item.find_all("td", {"class":"calendar__actual"})[0].text #Actual Value
-                        dict_["Forecast"] = item.find_all("td", {"class":"calendar__forecast"})[0].text #forecasted Value
-                        dict_["Previous"] = item.find_all("td", {"class":"calendar__previous"})[0].text # Previous
+                if (impact_value := impact[icon].find_all("span")[0]['title'].split(' ', 1)[0]) == "High": 
+                    dict_["Impact"] = impact_value
+                    dict_["Actual"] = item.find_all("td", {"class":"calendar__actual"})[0].text #Actual Value
+                    dict_["Forecast"] = item.find_all("td", {"class":"calendar__forecast"})[0].text #forecasted Value
+                    dict_["Previous"] = item.find_all("td", {"class":"calendar__previous"})[0].text # Previous
+                elif not (impact_value := impact[icon].find_all("span")[0]['title'].split(' ', 1)[0]) == "High" and MyBoolean  == False: 
+                    MyBoolean = True
+                    print("True & 25!")
+                else:
+                    print("hoi")
+                
+                print(dict_)
             if "Impact" in dict_:
                 ecoday.append(dict_)
-                print(dict_)
         ecoDict=[]
-    
         for item in ecoday:
             rec = ComplexEncoder() 
             ecoelem = PyEcoElement(
@@ -90,31 +96,8 @@ class PyEcoCal:
              )
             rec.ecoobject = ecoelem
             ecoDict.append(rec)
-
         json_object = json.dumps(ComplexEncoder().encode(ecoDict), indent = 3)  
-        return json_object
+        return json_object, ecoday
 eco = PyEcoCal()
-json = eco.get_economic_calendar("calendar?day=jan11.2023")
-
-intents = discord.Intents.all()
-client = discord.Client(command_prefix='!', intents=intents)
- 
-@client.event
-async def on_ready():
-    print('We have logged in as ' + client.user.name)
- 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
- 
-    if message.content.startswith('hi'):
-        await message.channel.send('Hello!')
-
-        embed = discord.Embed(title=dict_["Event"], description='Check hem meteen en vergeet geen duimpje achter te laten', color=15548997)
-        embed.set_footer(text="DoopieCash | © 2022")
-        embed.set_author(name='DoopieCash - Traden & Investeren', icon_url=client.user.avatar.url)
-        log = client.get_channel(1052977554119733301)
-        await log.send(embed=embed)
- 
-client.run('ODU5NDM0MzQ5NDI2NTA3Nzg2.G3ogtX.kHjrP388FlLDdq49NYdATuNvFUfWcurS-Gp8mE')
+json, ecoday = eco.get_economic_calendar("calendar?day=jan11.2023")
+print(ecoday)
