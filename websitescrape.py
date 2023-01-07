@@ -106,7 +106,7 @@ json, ecoday = eco.get_economic_calendar("calendar?day=today")
 def run_discord_bot():
     intents = discord.Intents.default()
     client = discord.Client(intents=intents)
-    TOKEN = 'MTA1NzI5Njg2OTQ4NDY2Njk4Mg.GxPZ3A.M3UWqssZ74lhcPNRk7VGo7MEQT_7k-PgV66cA0'
+    TOKEN = 'YOUR_TOKEN_HERE'
 
     @client.event
     async def on_ready():
