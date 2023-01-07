@@ -36,6 +36,7 @@ class PyEcoCal:
 
     def get_economic_calendar(self, date):
         baseURL = "https://www.forexfactory.com/"
+        global dict_
 
         ssl._create_default_https_context = ssl._create_unverified_context
     
@@ -100,5 +101,25 @@ class PyEcoCal:
         return json_object, ecoday
 eco = PyEcoCal()
 
-json, ecoday = eco.get_economic_calendar("calendar?day=jan11.2023")
-print(ecoday)
+json, ecoday = eco.get_economic_calendar("calendar?day=today")
+
+def run_discord_bot():
+    intents = discord.Intents.default()
+    client = discord.Client(intents=intents)
+    TOKEN = 'MTA1NzI5Njg2OTQ4NDY2Njk4Mg.GxPZ3A.M3UWqssZ74lhcPNRk7VGo7MEQT_7k-PgV66cA0'
+
+    @client.event
+    async def on_ready():
+        print(f'{client.user} is now running!')
+
+        
+        embed = discord.Embed(color=15548997)
+        embed.add_field(name="", value= dict_["Event"] + " " + dict_["Time_Eastern"] + " " + dict_["Impact"] + " " + dict_["Currency"])
+        embed.add_field(name= '\u200b', value='\u200b')
+        embed.add_field(name="Long", value=' \u200b')
+        embed.set_footer(text="Alixd91 | © 2022")
+        embed.set_author(name='ForexFactory Calendar', icon_url=client.user.avatar.url)
+        log = client.get_channel(1051535739919290450)
+        await log.send(embed=embed)
+    client.run(TOKEN)
+run_discord_bot()
