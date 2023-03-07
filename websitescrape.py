@@ -97,7 +97,7 @@ print(json_str)
 def run_discord_bot():
     intents = discord.Intents.default()
     client = discord.Client(intents=intents)
-
+    TOKEN = 'YOUR_TOKEN_HERE'
     @client.event
     async def on_ready():
         print(f'{client.user} is now running!')
