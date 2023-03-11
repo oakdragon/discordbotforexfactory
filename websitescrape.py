@@ -67,10 +67,17 @@ class PyEcoCal:
                 dict_["Event"] = item.find_all("td",{"class":"calendar__event"})[0].text.strip() #Event Name
                 dict_["Time_Eastern"] = item.find_all("td", {"class":"calendar__time"})[0].text #Time Eastern
                 
-                for icon in impact:
-                    impact_value = icon.find_all("span")[0]['title'].split(' ', 1)[0]
-                    if impact_value == "High": 
+            for icon in impact:
+                spans = icon.find_all("span")
+                if spans:
+                    impact_value = spans[0]['title'].split(' ', 1)[0]
+                    if impact_value == "High":
                         dict_["Impact"] = impact_value
+                    else:
+                        print('hoi')
+                else:
+                    print("No spans found for icon:", icon)
+                    break
 
                 if "Impact" in dict_:
                     ecoday.append(dict_)
@@ -89,7 +96,7 @@ class PyEcoCal:
         return json_object, ecoday
 
 eco = PyEcoCal()
-json_str, ecoday = eco.get_economic_calendar("calendar?day=mar8.2023")
+json_str, ecoday = eco.get_economic_calendar("calendar?day=mar11.2023")
 eco_elements = json.loads(json_str)
 print(json_str)
 
@@ -97,19 +104,49 @@ print(json_str)
 def run_discord_bot():
     intents = discord.Intents.default()
     client = discord.Client(intents=intents)
-    TOKEN = 'YOUR_TOKEN_HERE'
+    TOKEN = ''
+
     @client.event
     async def on_ready():
         print(f'{client.user} is now running!')
 
+        # create an empty dictionary to group currencies by time
+        currencies_by_time = {}
+
+        # group currencies by their time
+        for eco_element in eco_elements:
+            time = eco_element['time_eastern']
+            if time in currencies_by_time:
+                currencies_by_time[time].append(eco_element)
+            else:
+                currencies_by_time[time] = [eco_element]
+
+        # create embed and add fields for each group of currencies with the same time
         embed = discord.Embed(color=15548997)
         embed.set_footer(text="Alixd91 | © 2023")
         embed.set_author(name='ForexFactory Calendar', icon_url=client.user.avatar.url)
+        embed2 = discord.Embed(color=15548997)
+        embed2.set_footer(text="Alixd91 | © 2023")
+        embed2.set_author(name='ForexFactory Calendar', icon_url=client.user.avatar.url)
+        embed2.add_field(name="ER IS GEEN BELANGRIJKE DATA VANDAAG #REKT", value="", inline=False)
         log = client.get_channel(1051535739919290450)
 
-        for eco_element in eco_elements:
-               embed.add_field(name=eco_element['currency'], value=f"{eco_element['event']}\nTime: {eco_element['time_eastern']}", inline=False)
+        for time, currencies in currencies_by_time.items():
+                if len(currencies) == 1:
+                    # if there's only one currency for this time, display the currency in bold
+                    value = f"**{currencies[0]['currency']}**: {currencies[0]['event']}"
+                    if value:
+                        embed.add_field(name=f"\nTime: {time}", value=value, inline=False)
+                else:
+                    # if there are multiple currencies for this time, don't display the time label and make all currencies bold
+                    value = ''.join([f"**{currency['currency']}**: {currency['event']}\n" for currency in currencies])
+                    if value:
+                        embed.add_field(name='\u200b', value=value, inline=False)
 
-        await log.send(embed=embed)
+        if len(embed.fields) > 0:
+                await log.send(embed=embed)
+        else:
+                await log.send(embed=embed2)
+                print('No fields to send in the embed')
     client.run(TOKEN)
 run_discord_bot()
