@@ -80,6 +80,20 @@ class PyEcoCal:
                             event = item.find_all("td",{"class":"calendar__event"})[0].text.strip() #Event Name
                             dict_["Event"] = event
                             ecoday.append(dict_)
+                        elif impact_value == "Medium":
+                            dict_["Time_Eastern"] = time_temp #Assign time value to dictionary
+                            dict_["Currency"] = item.find_all("td", {"class":"calendar__currency"})[0].text.strip() #Currency
+                            dict_["Impact"] = impact_value
+                            event = item.find_all("td",{"class":"calendar__event"})[0].text.strip() #Event Name
+                            dict_["Event"] = event
+                            ecoday.append(dict_)
+                        elif impact_value == "Low":
+                            dict_["Time_Eastern"] = time_temp #Assign time value to dictionary
+                            dict_["Currency"] = item.find_all("td", {"class":"calendar__currency"})[0].text.strip() #Currency
+                            dict_["Impact"] = impact_value
+                            event = item.find_all("td",{"class":"calendar__event"})[0].text.strip() #Event Name
+                            dict_["Event"] = event
+                            ecoday.append(dict_)
 
         ecoDict = []
         for item in ecoday:
@@ -107,12 +121,71 @@ def run_discord_bot():
     am_tz = pytz.timezone('Europe/Amsterdam')
     send_time = datetime.time(hour=6, minute=0)
 
-    async def send_embed():
+    async def send_embed_highimpact():
         
         eco = PyEcoCal()
-        json_str, ecoday = eco.get_economic_calendar("calendar?day=mar16.2023")
+        json_str, ecoday = eco.get_economic_calendar("calendar?day=today")
         eco_elements = json.loads(json_str)
         print(json_str)
+        # create an empty dictionary to group currencies by time
+        currencies_by_time = {}
+     
+        # group currencies by their time
+        for eco_element in eco_elements:
+            time = eco_element['time_eastern']
+            if time in currencies_by_time:
+                currencies_by_time[time].append(eco_element)
+            else:
+                currencies_by_time[time] = [eco_element]
+        class MyView(discord.ui.View):
+            def __init__(self):
+                super().__init__()
+                self.pressed_users = set()
+            @discord.ui.button(label="", style=discord.ButtonStyle.success, emoji="🔔")
+            async def button_callback(self, button, interaction):
+                user_id = button.user.id
+                
+                if user_id not in self.pressed_users:
+                    self.pressed_users.add(user_id)
+                    await button.response.send_message("Je krijgt nu notificaties als er een event binnen 15 minuten begint!", ephemeral=True, delete_after=5.0)
+                else:
+                    self.pressed_users.discard(user_id)  # remove the user from the set
+                    await button.response.send_message("Je krijgt nu geen notificaties meer!", ephemeral=True, delete_after=5.0)
+
+
+
+        # create embed and add fields for each group of currencies with the same time
+        embed = discord.Embed(color=15548997)
+        embed.set_footer(text="Alixd91 | © 2023")
+        embed.set_author(name='ForexFactory Calendar', icon_url=client.user.avatar.url)
+        embed2 = discord.Embed(color=15548997)
+        embed2.set_footer(text="Alixd91 | © 2023")
+        embed2.set_author(name='ForexFactory Calendar', icon_url=client.user.avatar.url)
+        embed2.add_field(name="ER IS GEEN BELANGRIJKE DATA VANDAAG #REKT", value="", inline=False)
+        log = client.get_channel(1051535739919290450)
+
+        for time, currencies in currencies_by_time.items():
+            high_impact_currencies = [currency for currency in currencies if currency['impact'] == 'High']
+            if len(high_impact_currencies) == 1:
+                # if there's only one currency for this time, display the time label
+                value = f"{high_impact_currencies[0]['currency']}: {high_impact_currencies[0]['impact']}: {high_impact_currencies[0]['event']}"
+                embed.add_field(name=f'Time: {time}', value=value, inline=False)
+            elif len(high_impact_currencies) > 1:
+                # if there are multiple currencies with high impact for this time, don't display the time label
+                value = '\n'.join([f"{currency['currency']}: {currency['impact']} {currency['event']}" for currency in high_impact_currencies])
+                embed.add_field(name=f'Time: {time}', value=value, inline=False)
+
+        if len(embed.fields) > 0:
+            await log.send(embed=embed, view=MyView())
+        else:
+            await log.send(embed=embed2, view=MyView())
+            print('No fields to send in the embed')
+
+    async def send_embed_otherimpact():
+        
+        eco = PyEcoCal()
+        json_str, ecoday = eco.get_economic_calendar("calendar?day=today")
+        eco_elements = json.loads(json_str)
         # create an empty dictionary to group currencies by time
         currencies_by_time = {}
      
@@ -146,18 +219,32 @@ def run_discord_bot():
             if time_str.lower() == 'all day':
                 continue
             
-            time_obj = datetime.datetime.strptime(time_str, '%I:%M%p')
+            time_obj = datetime.datetime.strptime(time_str, '%I:%M%p').time()
+
+            delta = datetime.timedelta(hours=1)
+            datetime_obj = datetime.datetime.combine(datetime.date.today(), time_obj) + delta
+            new_time_obj = datetime_obj.time()
+            print(new_time_obj)
 
             # Convert the Eastern Time to UTC
-            time_et = et_tz.localize(time_obj)
-            time_utc = time_et.astimezone(datetime.timezone.utc)
+            # time_et = et_tz.localize(time_obj)
+            # time_utc = time_et.astimezone(datetime.timezone.utc)
 
-            # Convert the UTC time to Amsterdam time
-            time_am = time_utc.astimezone(am_tz)
-            print("Eastern time:", time_et.strftime('%I:%M %p'))
+            # # Convert the UTC time to Amsterdam time
+            # time_am = time_utc.astimezone(am_tz)
+            # print("Eastern time:", time_et.strftime('%I:%M %p'))
 
-            # Print the Amsterdam time
-            print("amsterdam time:", time_am.strftime('%I:%M %p'))
+            # # Print the Amsterdam time
+            # print("amsterdam time:", time_am.strftime('%I:%M %p'))
+
+            # for eco_element in eco_elements:
+            #     time_str = eco_element['time_eastern']
+
+                
+            #     if time_str.lower() == 'all day':
+            #         continue
+            #     time_obj = datetime.datetime.strptime(time_str, '%I:%M%p')
+            #     print(time_obj)
 
 
         # create embed and add fields for each group of currencies with the same time
@@ -171,13 +258,14 @@ def run_discord_bot():
         log = client.get_channel(1051535739919290450)
 
         for time, currencies in currencies_by_time.items():
-            if len(currencies) == 1:
+            high_impact_currencies = [currency for currency in currencies if currency['impact'] in ['Medium', 'Low']]
+            if len(high_impact_currencies) == 1:
                 # if there's only one currency for this time, display the time label
-                value = f"{currencies[0]['currency']}: {currencies[0]['event']}"
+                value = f"{high_impact_currencies[0]['currency']}: {high_impact_currencies[0]['event']} \n Impact: {high_impact_currencies[0]['impact']} "
                 embed.add_field(name=f'Time: {time}', value=value, inline=False)
-            else:
-                # if there are multiple currencies for this time, don't display the time label
-                value = '\n'.join([f"{currency['currency']}: {currency['event']}" for currency in currencies])
+            elif len(high_impact_currencies) > 1:
+                # if there are multiple currencies with high impact for this time, don't display the time label
+                value = '\n'.join([f"{currency['currency']}: {currency['event']} \n Impact: {currency['impact']}" for currency in high_impact_currencies])
                 embed.add_field(name=f'Time: {time}', value=value, inline=False)
 
         if len(embed.fields) > 0:
@@ -196,7 +284,8 @@ def run_discord_bot():
         # print(f"Waiting for {delay_seconds} seconds before sending the first message")
         # await asyncio.sleep(delay_seconds)
         while True:
-            await send_embed()
+            await send_embed_highimpact()
+            await send_embed_otherimpact()
             # wait for a day before checking the time again
             await asyncio.sleep(86400)
 
