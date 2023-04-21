@@ -1,4 +1,10 @@
+Bugs:
+✔ Bug: Time is not converting correctly @high @done (4/21/2023, 12:15:16 PM)
+
+
+To make:
 ✔ fix the gap if there are multiple events at the same time @critical @done (3/30/2023, 10:43:38 AM)
-☐ fix that you can press on a notify button that it notify's you in private message if a event is gonna begin in circa 15 minutes @low 
 ✔ fix that the time is next to time: and not below time: @critical time.stripe @done (3/30/2023, 10:43:30 AM)
-☐ Bug: Time is not converting correctly @high 
+☐ fix that you can press on a notify button that it notify's you in private message if a event is gonna begin in circa 15 minutes @high
+☐ Fix that if actual numbers are known the bot update it @low 
+☐ Fix that the event.json is grouping every time parent @critical 

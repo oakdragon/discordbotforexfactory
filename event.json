@@ -1,0 +1,107 @@
+[
+   {
+      "currency": "CAD",
+      "event": "Foreign Securities Purchases",
+      "impact": "Low",
+      "time_eastern": "8:30am",
+      "time_parent": 1681734600
+   },
+   {
+      "currency": "CAD",
+      "event": "Wholesale Sales m/m",
+      "impact": "Low",
+      "time_eastern": "8:30am",
+      "time_parent": 1681734600
+   },
+   {
+      "currency": "USD",
+      "event": "Empire State Manufacturing Index",
+      "impact": "High",
+      "time_eastern": "8:30am",
+      "time_parent": 1681734600
+   },
+   {
+      "currency": "GBP",
+      "event": "MPC Member Cunliffe Speaks",
+      "impact": "Low",
+      "time_eastern": "9:00am",
+      "time_parent": 1681736400
+   },
+   {
+      "currency": "USD",
+      "event": "NAHB Housing Market Index",
+      "impact": "Low",
+      "time_eastern": "10:00am",
+      "time_parent": 1681740000
+   },
+   {
+      "currency": "AUD",
+      "event": "CB Leading Index m/m",
+      "impact": "Low",
+      "time_eastern": "10:30am",
+      "time_parent": 1681741800
+   },
+   {
+      "currency": "EUR",
+      "event": "ECB President Lagarde Speaks",
+      "impact": "Medium",
+      "time_eastern": "11:00am",
+      "time_parent": 1681743600
+   },
+   {
+      "currency": "USD",
+      "event": "TIC Long-Term Purchases",
+      "impact": "Low",
+      "time_eastern": "4:00pm",
+      "time_parent": 1681761600
+   },
+   {
+      "currency": "AUD",
+      "event": "Monetary Policy Meeting Minutes",
+      "impact": "Medium",
+      "time_eastern": "9:30pm",
+      "time_parent": 1681781400
+   },
+   {
+      "currency": "CNY",
+      "event": "GDP q/y",
+      "impact": "Medium",
+      "time_eastern": "10:00pm",
+      "time_parent": 1681783200
+   },
+   {
+      "currency": "CNY",
+      "event": "Fixed Asset Investment ytd/y",
+      "impact": "Low",
+      "time_eastern": "10:00pm",
+      "time_parent": 1681783200
+   },
+   {
+      "currency": "CNY",
+      "event": "Industrial Production y/y",
+      "impact": "Low",
+      "time_eastern": "10:00pm",
+      "time_parent": 1681783200
+   },
+   {
+      "currency": "CNY",
+      "event": "NBS Press Conference",
+      "impact": "Low",
+      "time_eastern": "10:00pm",
+      "time_parent": 1681783200
+   },
+   {
+      "currency": "CNY",
+      "event": "Retail Sales y/y",
+      "impact": "Low",
+      "time_eastern": "10:00pm",
+      "time_parent": 1681783200
+   },
+   {
+      "currency": "CNY",
+      "event": "Unemployment Rate",
+      "impact": "Low",
+      "time_eastern": "10:00pm",
+      "time_parent": 1681783200
+   }
+]
