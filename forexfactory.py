@@ -61,7 +61,10 @@ class PyEcoCal:
 
             time_eastern = item.find_all("td", {"class":"calendar__time"})
             for time_item in time_eastern:
-                time_parent = int(time_item.parent.get("data-timestamp"))
+                try:
+                    time_parent = int(time_item.parent.get("data-timestamp"))
+                except ValueError:
+                    time_parent = 0
                 time_item = time_item.text.strip()
                 if time_item != "": # only save values that have text, otherwise dont replace the value
                   time_temp = time_item
