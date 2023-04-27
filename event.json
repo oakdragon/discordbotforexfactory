@@ -1,1 +1,26 @@
-{}
+{
+    "1682627400": {
+        "Advance GDP q/q": {
+            "currency": "USD",
+            "impact": "High",
+            "time_eastern": "2:30pm"
+        },
+        "Unemployment Claims": {
+            "currency": "USD",
+            "impact": "High",
+            "time_eastern": "2:30pm"
+        },
+            "1682628300": {
+                "Advance GDP q/q": {
+                    "currency": "USD",
+                    "impact": "High",
+                    "time_eastern": "2:30pm"
+                },
+                "Unemployment Claims": {
+                    "currency": "USD",
+                    "impact": "High",
+                    "time_eastern": "2:30pm"
+                }
+            }
+        }
+    }
