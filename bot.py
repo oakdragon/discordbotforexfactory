@@ -50,15 +50,17 @@ def run_discord_bot():
             @discord.ui.button(label="", style=discord.ButtonStyle.success, emoji="🔔")
             async def button_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
                 user_id = interaction.user.id
+                username = interaction.user.name
                 with open("data.json", "r") as f:
                     data = json.load(f)
-                if any(number == user_id for number in data["storedUserIds"]):
-                    data["storedUserIds"].remove(user_id)
+                    user_data = {'username': username, 'user_id': user_id}
+                if user_data in data["storedUserIds"]:
+                    data["storedUserIds"].remove({'username': username, 'user_id': user_id})
                     with open("data.json", "w") as f:
                         data = json.dump(data, f)
                     await interaction.response.send_message("Je krijgt nu geen notificaties meer!", ephemeral=True, delete_after=5.0)    
                 else:
-                    data["storedUserIds"].append(user_id)
+                    data["storedUserIds"].append({'username': username, 'user_id': user_id})
                     with open("data.json", "w") as f:
                         data = json.dump(data, f)
                     await interaction.response.send_message("Je krijgt nu notificaties als er een event binnen 15 minuten begint!", ephemeral=True, delete_after=5.0)
@@ -78,6 +80,7 @@ def run_discord_bot():
         embed2.add_field(name="ER IS GEEN DATA VANDAAG #REKT", value="", inline=False)
         log = client.get_channel(1051535739919290450)
         otherImpactChannel = client.get_channel(1051535739919290450)
+        counterOtherCurrencies = 0
         for (time, amsterdam_time), currencies in currencies_by_time.items():
             high_impactCurrencies = [currency for currency in currencies if currency['impact'] == 'High']
             OtherimpactCurrencies = [currency for currency in currencies if currency['impact'] in ['Medium', 'Low']]
@@ -93,10 +96,12 @@ def run_discord_bot():
                 # if there's only one currency for this time, display the time label
                 value = f"{OtherimpactCurrencies[0]['currency']}: {OtherimpactCurrencies[0]['event']} \n Impact: **{OtherimpactCurrencies[0]['impact']}** "
                 otherImpactembed.add_field(name=f'Time: {time} ({amsterdam_time})', value=value, inline=False)
+                counterOtherCurrencies = 1
             elif len(OtherimpactCurrencies) > 1:
                 # if there are multiple currencies with high impact for this time
                 value = '\n'.join([f"{currency['currency']}: {currency['event']} \n Impact: **{currency['impact']}**" for currency in OtherimpactCurrencies])
                 otherImpactembed.add_field(name=f'Time: {time} ({amsterdam_time})', value=value, inline=False)
+                counterOtherCurrencies = 1
         if len(embed.fields) > 0:   
             await log.send(embed=embed, view=MyView())
         else:
@@ -106,9 +111,8 @@ def run_discord_bot():
         if len(otherImpactembed.fields) > 0: 
             await otherImpactChannel.send(embed=otherImpactembed)
         else:
-            await otherImpactembed.send(embed=embed2)
+            await otherImpactChannel.send(embed=embed2)
             print('No fields to send in the embed')
-
 
     async def check_time():
         # now = datetime.datetime.now()
@@ -121,23 +125,30 @@ def run_discord_bot():
         # await asyncio.sleep(delay_seconds)
         while True:
             await send_embed_highimpact()
-            #wait for a day before checking the time again
+            # wait for a day before checking the time again
             await asyncio.sleep(86400)
     async def sendDM():
         with open("event.json", "r") as f:
             eventData = json.load(f)
+            print("waar ben ik?")
         with open("data.json", "r") as f:
             userData = json.load(f)
+            print("waarom verstop je?")
         timeList = [timeStamp for timeStamp in eventData]
+        print("Ik vind dit niet leuk!")
         if len(timeList) == 0:
             await asyncio.sleep(20)
+            print("zit ik hier vast?")
             return
+        print("of zit ik hier vast dan?")
         recentTime = min(timeList)
         recentTimeIt = datetime.datetime.fromtimestamp(int(recentTime))
         amsterdamTime =  recentTimeIt + datetime.timedelta(hours=-6)
         amsterdamConverted = amsterdamTime.strftime("%H:%M")
         timeUntilEvent = recentTimeIt - datetime.datetime.now()- datetime.timedelta(minutes=15)
-        # await asyncio.sleep(timeUntilEvent.total_seconds())
+        print("oof zit ik hier vast dan?")
+        await asyncio.sleep(timeUntilEvent.total_seconds())
+        print("zit ik hier vast dan?")
         dmEmbed = discord.Embed(color=15548997)
         dmEmbed.set_footer(text="Alixd91 | © 2023")
         dmEmbed.set_author(name='ForexFactory Calendar', icon_url=client.user.avatar.url)
@@ -157,7 +168,7 @@ def run_discord_bot():
                 events_str += value
             dmEmbed.add_field(name=f'The event is starting at: {amsterdamConverted}', value=events_str, inline=False)
         for User in userData["storedUserIds"]:
-            user = await client.fetch_user(User)
+            user = await client.fetch_user(User["user_id"])
             await user.send("Beep, Boop! Ik ben hier weer om je wakker te maken, want er gebeurt zo meteen weer iets spannends!", embed=dmEmbed)
             # SEND EMBED TO USERS
 
